@@ -15,20 +15,26 @@ One-screen Next.js page: founder enters ARR + category/industry + contact → ga
 - PWA manifest, build-time SVG QR (`qrcode`), fullscreen button, idle reset (kiosk=1), kiosk-only tiny SW.
 - Vitest (logic/API/export) + Playwright (no-scroll, flow, offline, idle).
 
+## Decisions from user (2026-10-25, override phases where they conflict)
+- Brand: keep Aspen Valuations; logo `aspen-logo-white.png` supplied (crop tagline for header).
+- Repo: github.com/khanhnhan1512/saas_valuation_calculator (public → client PDF/mp4/screens gitignored, history rewritten). Vercel Hobby.
+- DB: Neon via Vercel Marketplace (prod). Local dev/tests: PGlite (embedded Postgres) when DATABASE_URL unset. Driver: `@neondatabase/serverless` `sql.query(text, params)` behind tiny adapter.
+- Staff auth: NO Auth.js/Entra. Single `STAFF_PASSWORD` env → HMAC-signed httpOnly cookie (`AUTH_SECRET`), 12h. `/staff` page = password form + export + count.
+
 ## Phases
 | # | Phase | Target | Status | Progress |
 |---|---|---|---|---|
-| 01 | [Project setup & repo](phase-01-project-setup-and-repo.md) | Oct 25 | Not started | 0% |
-| 02 | [Valuation core + config + unit tests](phase-02-valuation-core-config-and-unit-tests.md) | Oct 25–26 | Not started | 0% |
-| 03 | [Layout & design system (static UI)](phase-03-layout-and-design-system.md) | Oct 26–27 | Not started | 0% |
-| 04 | [Calculator interactions, validation, result, reset/idle/fullscreen](phase-04-calculator-interactions-and-result.md) | Oct 27–28 | Not started | 0% |
-| 05 | [Lead API + DB schema + offline queue](phase-05-lead-api-db-and-offline-queue.md) | Oct 29 | Not started | 0% |
-| 06 | [Staff auth + Excel export + count](phase-06-staff-auth-export-and-count.md) | Oct 30 | Not started | 0% |
-| 07 | [PWA/kiosk + QR](phase-07-pwa-kiosk-and-qr.md) | Oct 31 | Not started | 0% |
-| 08 | [E2E tests + code review](phase-08-e2e-tests-and-review.md) | Nov 1 | Not started | 0% |
-| 09 | [Deploy + docs + booth checklist](phase-09-deploy-docs-and-booth-checklist.md) | Nov 2–3 | Not started | 0% |
+| 01 | [Project setup & repo](phase-01-project-setup-and-repo.md) | Oct 25 | Done | 100% |
+| 02 | [Valuation core + config + unit tests](phase-02-valuation-core-config-and-unit-tests.md) | Oct 25–26 | Done | 100% |
+| 03 | [Layout & design system (static UI)](phase-03-layout-and-design-system.md) | Oct 26–27 | Done | 100% |
+| 04 | [Calculator interactions, validation, result, reset/idle/fullscreen](phase-04-calculator-interactions-and-result.md) | Oct 27–28 | Done | 100% |
+| 05 | [Lead API + DB schema + offline queue](phase-05-lead-api-db-and-offline-queue.md) | Oct 29 | Done | 100% |
+| 06 | [Staff auth + Excel export + count](phase-06-staff-auth-export-and-count.md) | Oct 30 | Done | 100% |
+| 07 | [PWA/kiosk + QR](phase-07-pwa-kiosk-and-qr.md) | Oct 31 | Done | 100% |
+| 08 | [E2E tests + code review](phase-08-e2e-tests-and-review.md) | Nov 1 | Done | 100% |
+| 09 | [Deploy + docs + booth checklist](phase-09-deploy-docs-and-booth-checklist.md) | Nov 2–3 | In progress (docs done; Vercel/Neon setup + iPad dry run pending) | 60% |
 
-Overall: 0/9 phases. Critical path: 01→02→03→04→05→08→09 (06, 07 can overlap 05 if two devs).
+Overall: 8/9 phases done (2026-10-25). 140 unit + 23 E2E tests green. Critical path: 01→02→03→04→05→08→09 (06, 07 can overlap 05 if two devs).
 
 ## Timeline vs Nov 4
 - Oct 25–28: setup, logic, UI, interactions (UI no-scroll test at 1024x768 runs from phase 03, not deferred).

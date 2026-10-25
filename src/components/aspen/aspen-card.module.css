@@ -1,0 +1,86 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: calc(18 * var(--u));
+  min-width: 0;
+  padding: calc(var(--card-pad) - 2 * var(--u)) var(--card-pad) calc(var(--card-pad) - 2 * var(--u))
+    calc(var(--card-pad) + 6 * var(--u));
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.heading {
+  margin-bottom: calc(6 * var(--u));
+  font-size: calc(15 * var(--u));
+  font-weight: 700;
+}
+
+.intro,
+.bullets {
+  color: var(--muted);
+  font-size: calc(12.6 * var(--u));
+  line-height: 1.45;
+}
+
+.intro strong {
+  color: var(--text);
+}
+
+.bullets {
+  margin-top: calc(5 * var(--u));
+  padding-left: calc(18 * var(--u));
+}
+
+.qrFigure {
+  flex: none;
+  width: calc(116 * var(--u));
+  margin: 0;
+  text-align: center;
+}
+
+.qr {
+  padding: calc(6 * var(--u));
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.caption {
+  margin-top: calc(6 * var(--u));
+  color: var(--teal-text);
+  font-size: calc(11 * var(--u));
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+@media (min-width: 880px) and (max-width: 1279.98px) {
+  .card {
+    gap: 12px;
+  }
+  .intro,
+  .bullets {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .qrFigure {
+    width: 96px;
+  }
+}
+
+@media (max-width: 519.98px) {
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

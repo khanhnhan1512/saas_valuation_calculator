@@ -36,3 +36,6 @@ npm-debug.log*
 *.mp4
 /plans/*/reports/screens/
 /plans/*/reports/00-spec-extracted.txt
+
+# local PGlite database (dev only)
+/.data/

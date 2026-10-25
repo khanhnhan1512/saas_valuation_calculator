@@ -1,5 +1,9 @@
 # Phase 06: Staff auth + Excel export + count
 
+> **UPDATE 2026-10-25 (user decision):** Auth.js + Entra dropped. Replace `src/auth.ts`/nextauth route with:
+> `src/lib/staff-session.ts` — `createSessionToken()` = `${exp}.${hmacSHA256(AUTH_SECRET, exp)}`, `verifySessionToken()` (timingSafeEqual, exp check), cookie `aspen_staff` httpOnly/secure/sameSite=lax/12h; `requireStaff()` reads cookie.
+> `/staff` page: no session → password form (server action, constant-time compare vs `STAFF_PASSWORD`, ~400ms delay on fail); session → count, export form, sign out. Env: `STAFF_PASSWORD`, `AUTH_SECRET`, `DATABASE_URL` only.
+
 ## Context links
 - [plan.md](plan.md) · spec "Excel export", "Security and admin access", "API endpoints", env vars
 - `research/researcher-01-backend-stack-report.md` §2 (Auth.js v5 + Entra + Credentials code), §3 (ExcelJS route)

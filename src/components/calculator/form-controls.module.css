@@ -1,0 +1,183 @@
+/* Cards and step headings */
+.card {
+  min-width: 0;
+  padding: var(--card-pad) calc(var(--card-pad) + 6 * var(--u));
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: calc(9 * var(--u));
+  margin-bottom: calc(10 * var(--u));
+}
+
+.stepBadge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--on-teal);
+  font-size: calc(12 * var(--u));
+  font-weight: 700;
+}
+
+.stepHeading {
+  font-size: calc(15 * var(--u));
+  font-weight: 700;
+}
+
+.stepHint {
+  margin-left: auto;
+  color: var(--faint);
+  font-size: calc(12 * var(--u));
+  text-align: right;
+}
+
+/* Labels and fields */
+.label {
+  display: block;
+  margin-bottom: calc(3 * var(--u));
+  color: var(--muted);
+  font-size: calc(12.3 * var(--u));
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.required {
+  color: var(--teal-text);
+}
+
+.input,
+.select {
+  display: block;
+  width: 100%;
+  height: calc(35 * var(--u));
+  padding: 0 calc(11 * var(--u));
+  border: 1.5px solid var(--field-border);
+  border-radius: 10px;
+  outline: none;
+  background: var(--field);
+  /* 16px minimum stops iOS zooming into focused fields. */
+  font-size: max(16px, calc(15.5 * var(--u)));
+  transition: border-color 0.15s;
+}
+
+.input::placeholder {
+  color: var(--faint);
+  opacity: 0.75;
+}
+
+.input:focus,
+.select:focus {
+  border-color: var(--teal);
+}
+
+.select {
+  padding-right: calc(34 * var(--u));
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--teal) 50%) right calc(20 * var(--u)) center / 6px 6px no-repeat,
+    linear-gradient(-45deg, transparent 50%, var(--teal) 50%) right calc(14 * var(--u)) center / 6px 6px no-repeat,
+    var(--field);
+  cursor: pointer;
+}
+
+.select:invalid {
+  color: var(--muted);
+}
+
+.select option {
+  background: #ffffff;
+  color: #062421;
+}
+
+/* Chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(7 * var(--u));
+}
+
+.chip {
+  position: relative;
+  min-height: calc(28 * var(--u));
+  padding: calc(4 * var(--u)) calc(12.5 * var(--u));
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.16);
+  font-size: calc(12.8 * var(--u));
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+/* Larger invisible hit area for touch (44px target) without changing the look. */
+.chip::after {
+  position: absolute;
+  inset: -8px -3px;
+  content: '';
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: var(--on-teal);
+}
+
+.chip:disabled,
+.button:disabled {
+  cursor: default;
+}
+
+/* Primary button and error line */
+.button {
+  display: block;
+  width: 100%;
+  height: calc(41 * var(--u));
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--teal);
+  color: var(--on-teal);
+  font-size: calc(16 * var(--u));
+  font-weight: 700;
+}
+
+.button:disabled {
+  background: #0b8494;
+  color: #0a3a36;
+}
+
+.error {
+  min-height: 1.4em;
+  margin-top: calc(6 * var(--u));
+  color: var(--error);
+  font-size: calc(13 * var(--u));
+  text-align: center;
+}
+
+/* Narrow landscape (1024 wide iPad): chips wrap to an extra row, so tighten them. */
+@media (min-width: 880px) and (max-width: 1279.98px) {
+  .chips {
+    gap: 5px 6px;
+  }
+  .chip {
+    min-height: 26px;
+    padding: 3px 11px;
+    font-size: 12.5px;
+  }
+}
+
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

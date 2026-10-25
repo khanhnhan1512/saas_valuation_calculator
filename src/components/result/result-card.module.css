@@ -1,0 +1,128 @@
+.card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--card-pad) calc(var(--card-pad) + 6 * var(--u));
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+  transition: filter 0.35s ease, opacity 0.35s ease;
+}
+
+.blurred {
+  filter: blur(calc(9 * var(--u)));
+  opacity: 0.55;
+  user-select: none;
+}
+
+.kicker,
+.tilesHeading {
+  color: var(--teal-text);
+  font-size: calc(11.3 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.headline {
+  margin-top: calc(4 * var(--u));
+  font-size: calc(40 * var(--u));
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.joiner {
+  color: var(--faint);
+  font-size: calc(17 * var(--u));
+  font-weight: 400;
+}
+
+.basis {
+  margin-top: calc(6 * var(--u));
+  color: var(--muted);
+  font-size: calc(13.7 * var(--u));
+}
+
+/* Aspen tiles */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(9 * var(--u));
+  width: 100%;
+  margin: calc(9 * var(--u)) 0 calc(11 * var(--u));
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: calc(3 * var(--u));
+  padding: calc(9 * var(--u)) calc(7 * var(--u));
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--faint);
+  font-size: calc(10.4 * var(--u));
+  line-height: 1.3;
+}
+
+.tile strong {
+  color: var(--teal-text);
+  font-size: calc(20.5 * var(--u));
+  line-height: 1.1;
+}
+
+.resetButton {
+  min-height: calc(28 * var(--u));
+  padding: calc(5 * var(--u)) calc(16 * var(--u));
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.16);
+  font-size: calc(12.5 * var(--u));
+}
+
+/* Locked overlay */
+.lockOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(6 * var(--u));
+  padding: var(--card-pad);
+  text-align: center;
+}
+
+.lockIcon {
+  width: calc(46 * var(--u));
+  height: calc(46 * var(--u));
+  margin-bottom: calc(4 * var(--u));
+  padding: calc(11 * var(--u));
+  border: 2px solid var(--teal);
+  border-radius: 50%;
+  color: var(--teal-text);
+}
+
+.lockTitle {
+  font-size: calc(15.5 * var(--u));
+  font-weight: 700;
+}
+
+.lockHint {
+  color: var(--muted);
+  font-size: calc(13 * var(--u));
+}

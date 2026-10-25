@@ -1,0 +1,132 @@
+/* Design tokens (spec "Design system"). Same palette in light and dark system modes. */
+:root {
+  /* 1 --u = 1px at 1366 x 768; scales with the viewport, never below base, max 1.5x. */
+  --u: clamp(1px, min(100vh / 768, 100vw / 1366), 1.5px);
+
+  --bg: #12302c;
+  --bg-a: #1b4440;
+  --bg-b: #0c2220;
+  --grid: rgba(5, 180, 201, 0.06);
+  --card: rgba(255, 255, 255, 0.045);
+  --card-border: rgba(5, 180, 201, 0.38);
+  --field: rgba(0, 0, 0, 0.22);
+  --field-border: rgba(5, 180, 201, 0.3);
+  --teal: #05b4c9;
+  --teal-text: #3fd0e0;
+  --text: #ffffff;
+  --muted: #c4d6d3;
+  --faint: #93aaa6;
+  --on-teal: #062421;
+  --qr-dark: #1a322f;
+  --error: #ff9b8f;
+  --font: 'DIN Next LT Pro', Arial, Helvetica, sans-serif;
+  --pad-x: calc(36 * var(--u));
+  --col-gap: calc(21 * var(--u));
+  --card-gap: calc(11 * var(--u));
+  --card-pad: calc(15 * var(--u));
+
+  color-scheme: dark;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --u: clamp(1px, min(100dvh / 768, 100vw / 1366), 1.5px);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: calc(13 * var(--u));
+  line-height: 1.35;
+  letter-spacing: 0.012em;
+  word-spacing: 0.04em;
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 36px 36px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 36px 36px,
+    radial-gradient(circle at 0 0, var(--bg-a), var(--bg-b) 75%) var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+h1,
+h2,
+h3,
+p,
+ul {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal-text);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Tighter spacing on narrow landscape screens (1024 to 1279 wide) so everything still fits. */
+@media (min-width: 880px) and (max-width: 1279.98px) {
+  :root {
+    --pad-x: 16px;
+    --col-gap: 14px;
+    --card-pad: 12px;
+  }
+}
+
+@media (max-width: 879.98px) {
+  :root {
+    --pad-x: 16px;
+  }
+}

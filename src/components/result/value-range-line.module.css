@@ -1,0 +1,85 @@
+/* Range line: track, teal band, three markers, zoomed axis labels. */
+.rangeLine {
+  width: 100%;
+  margin: calc(16 * var(--u)) 0 calc(26 * var(--u));
+}
+
+.track {
+  position: relative;
+  height: calc(11 * var(--u));
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--lo);
+  right: calc(100% - var(--hi));
+  background: linear-gradient(90deg, var(--teal), var(--teal-text));
+}
+
+.tick {
+  position: absolute;
+  top: calc(-4 * var(--u));
+  width: 3px;
+  height: calc(19 * var(--u));
+  border-radius: 2px;
+  background: #ffffff;
+  transform: translateX(-50%);
+}
+
+.tickMid {
+  top: calc(-7 * var(--u));
+  height: calc(25 * var(--u));
+  background: var(--teal-text);
+  box-shadow: 0 0 8px rgba(63, 208, 224, 0.8);
+}
+
+.rangeLabels {
+  position: relative;
+  height: calc(34 * var(--u));
+  margin-top: calc(8 * var(--u));
+}
+
+.axisEnd {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--faint);
+  font-size: calc(10.3 * var(--u));
+}
+
+.axisEndRight {
+  right: 0;
+  left: auto;
+}
+
+.markerLabel {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--faint);
+  font-size: calc(10.5 * var(--u));
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.markerLabel strong {
+  color: var(--text);
+  font-size: calc(15 * var(--u));
+  font-variant-numeric: tabular-nums;
+}
+
+.markerMid strong {
+  color: var(--teal-text);
+  font-size: calc(18 * var(--u));
+}
+
+.markerMid {
+  color: var(--muted);
+}

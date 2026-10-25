@@ -1,0 +1,71 @@
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Keep normal contrast after submit; the form is only frozen, not "greyed out". */
+.fieldset:disabled input,
+.fieldset:disabled button {
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: calc(9 * var(--u)) calc(11 * var(--u));
+  margin-bottom: calc(11 * var(--u));
+}
+
+.firstName,
+.lastName,
+.company {
+  grid-column: span 2;
+}
+
+.email {
+  grid-column: span 4;
+}
+
+.phone {
+  grid-column: span 2;
+}
+
+.nextMoves {
+  align-items: center;
+  margin-bottom: calc(12 * var(--u));
+}
+
+/* Fills the space left on the chip row so opening "Other" never adds a row. */
+.otherInput {
+  flex: 1 1 calc(80 * var(--u));
+  width: auto;
+  min-width: calc(80 * var(--u));
+  height: calc(28 * var(--u));
+  font-size: 16px;
+}
+
+/* Push the button to the bottom so spare height sits above it, not below the error line. */
+.fieldset + button {
+  margin-top: auto;
+}
+
+@media (max-width: 519.98px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+  .firstName,
+  .lastName,
+  .company,
+  .email,
+  .phone {
+    grid-column: auto;
+  }
+}
