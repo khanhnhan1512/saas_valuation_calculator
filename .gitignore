@@ -1,0 +1,38 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js / build
+/.next/
+/out/
+/build
+*.tsbuildinfo
+next-env.d.ts
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# env & secrets (keep only the template)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+Thumbs.db
+*.pem
+npm-debug.log*
+
+# client reference material (confidential, never commit)
+/reference/
+*.pdf
+*.mp4
+/plans/*/reports/screens/
+/plans/*/reports/00-spec-extracted.txt
