@@ -16,6 +16,7 @@ src/
   lib/lead-intake.ts           POST /api/leads logic (zod, honeypot, recalculation, insert, email delivery)
   lib/lead-emails.ts           builds the visitor and team emails (HTML + text, escaped)
   lib/mailer.ts                Resend client, outcome mapping (sent / rejected / retry), env setup
+  lib/smtp-mailer.ts           SMTP alternative (nodemailer), e.g. Gmail for a demo
   lib/db.ts                    Neon or PGlite adapter + schema
   lib/leads-repository.ts      insert, export list, count (time-zone aware filters)
   lib/export-workbook.ts       ExcelJS workbook, Toronto wall-clock dates, file name

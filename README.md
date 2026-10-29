@@ -45,6 +45,7 @@ Useful URLs:
 | `RESEND_API_KEY` | Vercel | Resend API key. Required on Vercel. |
 | `EMAIL_FROM` | Vercel | Sender on the domain verified in Resend, e.g. `Aspen Valuations <no-reply@aspenval.com>` |
 | `EMAIL_TEAM_TO` | Vercel | Shared company inbox: gets every lead and the visitors' replies |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Vercel (optional) | Send over SMTP instead of Resend, e.g. Gmail for a demo. `SMTP_HOST` set means SMTP is used. |
 
 ## Docs
 

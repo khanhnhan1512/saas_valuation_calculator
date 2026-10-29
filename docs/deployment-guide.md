@@ -38,6 +38,13 @@ How failures behave:
 - An email Resend refuses for good (e.g. a malformed address) is marked `failed` in the `leads` table and not retried.
 - On Vercel all three email variables are required. Without them every lead stays queued until they are set.
 
+### Demo with Gmail (before the domain is verified)
+SMTP can stand in for Resend; when `SMTP_HOST` is set, SMTP is used.
+1. In the Gmail account: turn on 2-Step Verification, then create an app password at myaccount.google.com/apppasswords.
+2. Vercel variables: `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USER=<the Gmail address>`, `SMTP_PASS=<the app password>`, and `EMAIL_FROM=Aspen Valuations <the same Gmail address>` (Gmail replaces any other sender). Redeploy.
+3. Gmail keeps a copy of every email in Sent, which holds visitors' personal information: delete them after the demo.
+4. To move to Resend: delete `SMTP_HOST`, set `EMAIL_FROM` to the verified domain address, Redeploy.
+
 ## 5. Rate limit (Vercel Firewall)
 The spec asks for 10 submits per IP per minute. The app already enforces this per server instance; add the global rule:
 1. Firewall → **Configure** → **New Rule**.

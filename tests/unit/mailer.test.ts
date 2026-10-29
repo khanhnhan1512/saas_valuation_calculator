@@ -89,4 +89,33 @@ describe('mailerFromEnv', () => {
     setEnv('re_test', CONFIG.from, ' leads@aspen.example ', '1');
     expect(mailerFromEnv()?.teamAddress).toBe('leads@aspen.example');
   });
+
+  function setSmtp(host: string, user: string, pass: string) {
+    vi.stubEnv('SMTP_HOST', host);
+    vi.stubEnv('SMTP_PORT', '1'); // nothing listens on port 1: the connection fails fast
+    vi.stubEnv('SMTP_USER', user);
+    vi.stubEnv('SMTP_PASS', pass);
+  }
+
+  it('uses SMTP instead of Resend when SMTP_HOST is set', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+    setEnv('re_test', 'Aspen Valuations <demo@gmail.com>', 'leads@aspen.example', '1');
+    setSmtp('127.0.0.1', 'demo@gmail.com', 'app-password');
+
+    const mailer = mailerFromEnv();
+    expect(mailer?.teamAddress).toBe('leads@aspen.example');
+    expect(await mailer!.send(EMAIL, 'k')).toBe('retry'); // connection refused
+    expect(fetchSpy).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it('an incomplete SMTP setup counts as not configured', async () => {
+    setEnv('', 'Aspen Valuations <demo@gmail.com>', 'leads@aspen.example', '');
+    setSmtp('smtp.gmail.com', 'demo@gmail.com', '');
+    expect(mailerFromEnv()).toBeNull();
+
+    vi.stubEnv('VERCEL', '1');
+    expect(await mailerFromEnv()!.send(EMAIL, 'k')).toBe('retry');
+  });
 });

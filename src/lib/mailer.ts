@@ -1,7 +1,8 @@
-// Sends email through the Resend API (POST /emails). Configured by RESEND_API_KEY, EMAIL_FROM
-// and EMAIL_TEAM_TO; without them email is off in local development and tests.
+// Sends email through the Resend API (POST /emails), or over SMTP when SMTP_HOST is set (see
+// smtp-mailer.ts). Without a setup, email is off in local development and tests.
 import { EMAIL_TIMEOUT_MS } from '@/config/valuation-config';
 import type { OutgoingEmail } from './lead-emails';
+import { createSmtpMailer } from './smtp-mailer';
 
 const RESEND_URL = 'https://api.resend.com/emails';
 
@@ -73,19 +74,30 @@ export function createResendMailer(config: ResendConfig, fetchImpl: typeof fetch
 const notConfigured: Mailer = {
   teamAddress: '',
   async send() {
-    console.error('email is not configured: set RESEND_API_KEY, EMAIL_FROM and EMAIL_TEAM_TO');
+    console.error(
+      'email is not configured: set EMAIL_FROM, EMAIL_TEAM_TO and RESEND_API_KEY (or SMTP_HOST, SMTP_USER, SMTP_PASS)',
+    );
     return 'retry';
   },
 };
 
+const env = (name: string) => process.env[name]?.trim() ?? '';
+
 /**
- * The Resend mailer from env, or null (email off) in local development and tests.
- * On Vercel a missing setup returns "retry", so leads stay stored and queued until it is fixed.
+ * SMTP when SMTP_HOST is set (e.g. Gmail for a demo), otherwise Resend. Null (email off) in local
+ * development and tests. On Vercel a missing setup returns "retry", so leads stay stored and queued.
  */
 export function mailerFromEnv(): Mailer | null {
-  const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim();
-  const teamAddress = process.env.EMAIL_TEAM_TO?.trim();
-  if (apiKey && from && teamAddress) return createResendMailer({ apiKey, from, teamAddress });
+  const from = env('EMAIL_FROM');
+  const teamAddress = env('EMAIL_TEAM_TO');
+  if (from && teamAddress) {
+    if (env('SMTP_HOST')) {
+      const [host, user, pass] = [env('SMTP_HOST'), env('SMTP_USER'), env('SMTP_PASS')];
+      const port = Number(env('SMTP_PORT')) || 465;
+      if (user && pass) return createSmtpMailer({ host, port, user, pass, from, teamAddress });
+    } else if (env('RESEND_API_KEY')) {
+      return createResendMailer({ apiKey: env('RESEND_API_KEY'), from, teamAddress });
+    }
+  }
   return process.env.VERCEL ? notConfigured : null;
 }
