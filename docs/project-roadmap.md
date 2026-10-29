@@ -10,7 +10,8 @@
 | Staff password, Excel export, lead count | Done |
 | PWA manifest, icons, QR code, kiosk service worker | Done |
 | E2E suite + CI | Done |
-| Vercel project, Neon database, env vars, firewall rule | To do (see deployment guide) |
+| Result email to the visitor, lead email to the shared company inbox (Resend) | Done |
+| Vercel project, Neon database, Resend domain, env vars, firewall rule | To do (see deployment guide) |
 | Real iPad dry run with the booth checklist (by Nov 3) | To do |
 
 ## Phase 2: public website

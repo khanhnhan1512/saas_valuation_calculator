@@ -31,6 +31,9 @@ const SCHEMA = [
     source text NOT NULL DEFAULT 'website'
   )`,
   'CREATE INDEX IF NOT EXISTS leads_submitted_at_idx ON leads (submitted_at)',
+  // Email delivery per lead: null = not sent yet, 'sent', or 'failed' (Resend refused it for good).
+  'ALTER TABLE leads ADD COLUMN IF NOT EXISTS team_email_status text',
+  'ALTER TABLE leads ADD COLUMN IF NOT EXISTS visitor_email_status text',
 ];
 
 let dbPromise: Promise<Db> | null = null;

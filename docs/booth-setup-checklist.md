@@ -18,13 +18,14 @@ Booth URL: `https://<your-domain>/?source=saas-north-2026-booth&kiosk=1`
 - [ ] Screen sleep off.
 
 ## Verify (every morning)
-- [ ] Submit a test lead (first name `TEST`) and check the result shows.
+- [ ] Submit a test lead (first name `TEST`, your own email) and check the result shows, the result email arrives, and the team inbox gets the lead.
 - [ ] Airplane mode on → submit → footer shows **1 queued** → Airplane mode off → the queued count disappears within 30 s.
 - [ ] After a result, leave the screen alone for 2 minutes → it resets for the next visitor.
 - [ ] Scan the QR code with a phone → Aspen contact page opens.
 
 ## During the day
-- Use venue Wi-Fi with a phone hotspot as backup. Leads are safe offline; they send when the network returns.
+- Use venue Wi-Fi with a phone hotspot as backup. Leads are safe offline; they send when the network returns, and the emails go out then.
+- If "queued" stays up while the network works, email is failing (often the daily quota): tell whoever runs the Vercel and Resend accounts. Leads are already stored.
 - **Never** delete the home-screen app, clear Safari data or swap devices while the footer shows "queued".
 
 ## End of day

@@ -102,4 +102,6 @@ export const SOURCE_PATTERN = /^[a-z0-9-]{1,64}$/;
 export const EVENT_TIMEZONE = 'America/Toronto';
 export const IDLE_RESET_MS = 120_000;
 export const QUEUE_RETRY_MS = 30_000;
+/** Per email; two emails plus the insert must finish inside the browser's 10 s request timeout. */
+export const EMAIL_TIMEOUT_MS = 4_000;
 export const CONTACT_URL = 'https://aspenval.com/ca/contact-us/';

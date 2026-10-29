@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { applySchema, connectPglite, type Db } from '@/lib/db';
 import { processLead } from '@/lib/lead-intake';
 import { countLeads, listLeadsForExport } from '@/lib/leads-repository';
+import type { Mailer, SendOutcome } from '@/lib/mailer';
 
 let db: Db;
 const getDb = async () => db;
@@ -121,6 +122,72 @@ describe('POST /api/leads logic', () => {
   it('falls back to "website" for an invalid source tag', async () => {
     await send(payload({ source: 'DROP TABLE' }));
     expect((await db.query('SELECT source FROM leads'))[0].source).toBe('website');
+  });
+});
+
+describe('lead emails', () => {
+  type Kind = 'team' | 'visitor';
+
+  /** Records each send; outcomes are scripted per email kind, defaulting to "sent". */
+  function fakeMailer(script: Partial<Record<Kind, SendOutcome[]>> = {}) {
+    const calls: Array<{ kind: Kind; to: string; key: string; outcome: SendOutcome }> = [];
+    const mailer: Mailer = {
+      teamAddress: 'leads@aspen.example',
+      async send(email, key) {
+        const kind: Kind = key.endsWith('-team') ? 'team' : 'visitor';
+        const outcome = script[kind]?.shift() ?? 'sent';
+        calls.push({ kind, to: email.to, key, outcome });
+        return outcome;
+      },
+    };
+    return { mailer, calls };
+  }
+
+  const sendWith = (mailer: Mailer, body = payload()) => processLead(JSON.stringify(body), getDb, mailer);
+  const emailStatus = async () =>
+    (await db.query('SELECT team_email_status, visitor_email_status FROM leads'))[0];
+
+  it('emails the team inbox, then the visitor, once per lead', async () => {
+    const { mailer, calls } = fakeMailer();
+    expect((await sendWith(mailer)).status).toBe(200);
+    expect(calls.map((c) => [c.kind, c.to])).toEqual([
+      ['team', 'leads@aspen.example'],
+      ['visitor', 'jane@northwind.io'],
+    ]);
+    expect(await emailStatus()).toEqual({ team_email_status: 'sent', visitor_email_status: 'sent' });
+
+    // The browser retrying the same lead sends nothing again.
+    expect((await sendWith(mailer)).status).toBe(200);
+    expect(calls).toHaveLength(2);
+  });
+
+  it('keeps the lead and asks for a retry when email is down; the retry sends only what is missing', async () => {
+    const { mailer, calls } = fakeMailer({ visitor: ['retry'] });
+    expect((await sendWith(mailer)).status).toBe(503);
+    expect(await countLeads(db)).toBe(1);
+    expect(await emailStatus()).toEqual({ team_email_status: 'sent', visitor_email_status: null });
+
+    const retry = await sendWith(mailer);
+    expect(retry).toMatchObject({ status: 200, body: { ok: true, duplicate: true } });
+    expect(calls.map((c) => `${c.kind}:${c.outcome}`)).toEqual(['team:sent', 'visitor:retry', 'visitor:sent']);
+    // Same idempotency key on every attempt, so Resend never sends it twice.
+    expect(calls[1].key).toBe(calls[2].key);
+    expect(await countLeads(db)).toBe(1);
+  });
+
+  it('marks an email Resend refuses for good as failed and does not retry it', async () => {
+    const { mailer, calls } = fakeMailer({ visitor: ['rejected'] });
+    expect((await sendWith(mailer)).status).toBe(200);
+    expect((await sendWith(mailer)).status).toBe(200);
+    expect(calls).toHaveLength(2);
+    expect(await emailStatus()).toEqual({ team_email_status: 'sent', visitor_email_status: 'failed' });
+  });
+
+  it('sends nothing for bots or invalid forms', async () => {
+    const { mailer, calls } = fakeMailer();
+    await sendWith(mailer, payload({ websiteUrl: 'http://spam.example' }));
+    await sendWith(mailer, payload({ email: 'jane@northwind' }));
+    expect(calls).toHaveLength(0);
   });
 });
 

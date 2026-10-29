@@ -39,6 +39,28 @@ export async function insertLead(db: Db, lead: LeadRecord): Promise<boolean> {
   return rows.length === 1;
 }
 
+export type EmailKind = 'team' | 'visitor';
+export type EmailStatus = 'sent' | 'failed';
+
+// Fixed column names, never built from input.
+const EMAIL_STATUS_COLUMN: Record<EmailKind, string> = {
+  team: 'team_email_status',
+  visitor: 'visitor_email_status',
+};
+
+/** Delivery status of each email for a lead; null means not sent yet. */
+export async function getEmailStatus(db: Db, id: string): Promise<Record<EmailKind, string | null>> {
+  const [row] = await db.query('SELECT team_email_status, visitor_email_status FROM leads WHERE id = $1', [id]);
+  return {
+    team: (row?.team_email_status as string | null | undefined) ?? null,
+    visitor: (row?.visitor_email_status as string | null | undefined) ?? null,
+  };
+}
+
+export async function setEmailStatus(db: Db, id: string, kind: EmailKind, status: EmailStatus): Promise<void> {
+  await db.query(`UPDATE leads SET ${EMAIL_STATUS_COLUMN[kind]} = $2 WHERE id = $1`, [id, status]);
+}
+
 export interface LeadFilters {
   /** Inclusive dates (YYYY-MM-DD) in the event time zone. */
   from?: string | null;
