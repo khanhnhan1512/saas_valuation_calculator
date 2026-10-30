@@ -55,6 +55,16 @@ describe('Resend mailer', () => {
     });
   });
 
+  it('sends attachments as base64', async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ id: 'email-2' }));
+    const mailer = createResendMailer(CONFIG, fetchImpl as unknown as typeof fetch);
+    const file = { filename: 'leads.xlsx', content: new Uint8Array([1, 2, 3]) };
+
+    expect(await mailer.send({ ...EMAIL, attachments: [file] }, 'daily-1')).toBe('sent');
+    const [, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(JSON.parse(init.body as string).attachments).toEqual([{ filename: 'leads.xlsx', content: 'AQID' }]);
+  });
+
   it('retries after a network error and reports a refused email', async () => {
     const offline = createResendMailer(CONFIG, (async () => {
       throw new TypeError('fetch failed');

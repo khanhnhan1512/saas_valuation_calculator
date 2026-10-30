@@ -22,6 +22,7 @@ Settings → Environment Variables (Production and Preview):
 | `RESEND_API_KEY` | API key from Resend (see step 4) |
 | `EMAIL_FROM` | sender on the verified domain, e.g. `Aspen Valuations <no-reply@aspenval.com>` |
 | `EMAIL_TEAM_TO` | the shared company inbox that gets every lead (and the visitors' replies) |
+| `CRON_SECRET` | 16+ random characters (same command as `AUTH_SECRET`); unlocks the daily Excel email, see step 4 |
 
 Redeploy after adding variables (Deployments → ⋯ → Redeploy).
 
@@ -37,6 +38,13 @@ How failures behave:
 - If Resend is down, over quota or not set up, the API answers 503 and the device keeps the lead queued; the retry sends only the missing email. The footer then shows "queued" at the booth: check the Vercel logs (`email not sent: <status>`).
 - An email Resend refuses for good (e.g. a malformed address) is marked `failed` in the `leads` table and not retried.
 - On Vercel all three email variables are required. Without them every lead stays queued until they are set.
+
+### Daily Excel email (Vercel Cron)
+Every evening the team inbox (`EMAIL_TEAM_TO`) gets one email with an Excel file of every lead not sent before, so staff rarely need `/staff`.
+- Schedule: `vercel.json`, `0 23 * * *` in UTC, which is 18:00 in Toronto in winter (19:00 in summer). On the Hobby plan Vercel may run it any time within that hour.
+- Needs `CRON_SECRET`: Vercel sends it with each run, and the route refuses every other caller. Without it the route stays closed and no daily email goes out.
+- No new leads: no email. A failed send keeps the leads for the next evening; a missed run is caught up the next day.
+- Test it: Settings → **Cron Jobs** → **Run** next to `/api/cron/daily-leads`. Logs: **View Logs** on the same page.
 
 ### Demo with Gmail (before the domain is verified)
 SMTP can stand in for Resend; when `SMTP_HOST` is set, SMTP is used.

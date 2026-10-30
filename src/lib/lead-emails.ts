@@ -1,9 +1,15 @@
-// Builds the two emails sent for each lead: the visitor's result and the lead details for the team inbox.
-import { EMAIL_COPY } from '@/config/email-copy';
+// Builds the emails: per lead, the visitor's result and the lead details for the team inbox;
+// once a day, the summary that carries the Excel file.
+import { DAILY_EMAIL_LIST_MAX, EMAIL_COPY } from '@/config/email-copy';
 import { COPY } from '@/config/site-copy';
 import { CONTACT_URL, EVENT_TIMEZONE } from '@/config/valuation-config';
 import { formatArrInput, formatMoney, formatMultiple } from './formatters';
-import type { LeadRecord } from './leads-repository';
+import type { ExportRow, LeadRecord } from './leads-repository';
+
+export interface EmailAttachment {
+  filename: string;
+  content: Uint8Array;
+}
 
 export interface OutgoingEmail {
   to: string;
@@ -11,6 +17,7 @@ export interface OutgoingEmail {
   subject: string;
   html: string;
   text: string;
+  attachments?: EmailAttachment[];
 }
 
 type Row = { label: string; value: string; href?: string };
@@ -29,6 +36,8 @@ const submittedFormat = new Intl.DateTimeFormat('en-CA', {
   dateStyle: 'medium',
   timeStyle: 'short',
 });
+
+const dayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: EVENT_TIMEZONE, dateStyle: 'medium' });
 
 function resultRows(lead: LeadRecord): Row[] {
   const { labels, rangeValue } = EMAIL_COPY;
@@ -125,5 +134,25 @@ export function teamEmail(lead: LeadRecord, teamAddress: string): OutgoingEmail 
     subject: oneLine(EMAIL_COPY.teamSubject(name, lead.company, formatMoney(lead.midValue))),
     html: pageHtml(p(EMAIL_COPY.teamIntro) + tableHtml(rows)),
     text: `${EMAIL_COPY.teamIntro}\n\n${rowsText(rows)}`,
+  };
+}
+
+/** The daily summary to the team inbox; the caller attaches the Excel file. */
+export function dailyLeadsEmail(leads: ExportRow[], teamAddress: string, staffUrl: string | null, now: Date): OutgoingEmail {
+  const shown = leads.slice(0, DAILY_EMAIL_LIST_MAX);
+  const rows: Row[] = shown.map((l) => ({
+    label: `${l.firstName} ${l.lastName}`,
+    value: `${l.company}, ${formatMoney(l.midValue)} midpoint`,
+  }));
+  const more = leads.length - shown.length;
+  const outro = [more > 0 ? EMAIL_COPY.dailyMore(more) : '', staffUrl ? `${EMAIL_COPY.dailyStaffHint} ${staffUrl}` : '']
+    .filter(Boolean);
+
+  return {
+    to: teamAddress,
+    replyTo: teamAddress,
+    subject: oneLine(EMAIL_COPY.dailySubject(leads.length, dayFormat.format(now))),
+    html: pageHtml(p(EMAIL_COPY.dailyIntro(leads.length)) + tableHtml(rows) + outro.map((line) => p(line)).join('')),
+    text: [EMAIL_COPY.dailyIntro(leads.length), rowsText(rows), ...outro].join('\n\n'),
   };
 }

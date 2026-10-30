@@ -17,6 +17,8 @@ src/
   lib/lead-emails.ts           builds the visitor and team emails (HTML + text, escaped)
   lib/mailer.ts                Resend client, outcome mapping (sent / rejected / retry), env setup
   lib/smtp-mailer.ts           SMTP alternative (nodemailer), e.g. Gmail for a demo
+  lib/daily-report.ts          daily Excel email: claim unsent leads, email them, release on failure
+  app/api/cron/daily-leads/    Vercel Cron route (vercel.json), guarded by CRON_SECRET
   lib/db.ts                    Neon or PGlite adapter + schema
   lib/leads-repository.ts      insert, export list, count (time-zone aware filters)
   lib/export-workbook.ts       ExcelJS workbook, Toronto wall-clock dates, file name

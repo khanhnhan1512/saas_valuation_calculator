@@ -1,5 +1,5 @@
 import { EVENT_TIMEZONE } from '@/config/valuation-config';
-import type { Db } from './db';
+import type { Db, Row } from './db';
 
 export interface LeadRecord {
   id: string;
@@ -92,17 +92,12 @@ const FILTER_SQL = `
 
 const filterParams = (f: LeadFilters) => [f.from ?? null, f.to ?? null, f.source ?? null];
 
-/** Every matching lead, oldest first. Read only: exporting never deletes data. */
-export async function listLeadsForExport(db: Db, filters: LeadFilters = {}): Promise<ExportRow[]> {
-  const rows = await db.query(
-    `SELECT submitted_at, first_name, last_name, email, phone, company, next_move, arr, category,
-            industry, mid_multiple, low_value, mid_value, high_value
-     FROM leads WHERE ${FILTER_SQL}
-     ORDER BY submitted_at ASC, received_at ASC`,
-    filterParams(filters),
-  );
-  // Postgres drivers return bigint/numeric as strings; convert once here.
-  return rows.map((r) => ({
+const EXPORT_COLUMNS = `submitted_at, first_name, last_name, email, phone, company, next_move, arr, category,
+  industry, mid_multiple, low_value, mid_value, high_value`;
+
+// Postgres drivers return bigint/numeric as strings; convert once here.
+function toExportRow(r: Row): ExportRow {
+  return {
     submittedAt: new Date(r.submitted_at as string | Date),
     firstName: String(r.first_name),
     lastName: String(r.last_name),
@@ -117,7 +112,39 @@ export async function listLeadsForExport(db: Db, filters: LeadFilters = {}): Pro
     lowValue: Number(r.low_value),
     midValue: Number(r.mid_value),
     highValue: Number(r.high_value),
-  }));
+  };
+}
+
+/** Every matching lead, oldest first. Read only: exporting never deletes data. */
+export async function listLeadsForExport(db: Db, filters: LeadFilters = {}): Promise<ExportRow[]> {
+  const rows = await db.query(
+    `SELECT ${EXPORT_COLUMNS} FROM leads WHERE ${FILTER_SQL} ORDER BY submitted_at ASC, received_at ASC`,
+    filterParams(filters),
+  );
+  return rows.map(toExportRow);
+}
+
+/**
+ * Claims every lead not yet in a daily email, stamping it with this run's time. One atomic UPDATE,
+ * so two overlapping runs never claim the same lead. Returns how many were claimed.
+ */
+export async function claimUnreportedLeads(db: Db, runAt: string): Promise<number> {
+  const rows = await db.query('UPDATE leads SET daily_report_at = $1 WHERE daily_report_at IS NULL RETURNING id', [runAt]);
+  return rows.length;
+}
+
+/** The leads claimed by one run, oldest first. */
+export async function listClaimedLeads(db: Db, runAt: string): Promise<ExportRow[]> {
+  const rows = await db.query(
+    `SELECT ${EXPORT_COLUMNS} FROM leads WHERE daily_report_at = $1 ORDER BY submitted_at ASC, received_at ASC`,
+    [runAt],
+  );
+  return rows.map(toExportRow);
+}
+
+/** Gives a run's leads back when its email failed, so the next run sends them. */
+export async function releaseClaimedLeads(db: Db, runAt: string): Promise<void> {
+  await db.query('UPDATE leads SET daily_report_at = NULL WHERE daily_report_at = $1', [runAt]);
 }
 
 export async function countLeads(db: Db, filters: LeadFilters = {}): Promise<number> {

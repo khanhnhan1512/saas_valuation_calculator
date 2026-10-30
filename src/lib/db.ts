@@ -34,6 +34,8 @@ const SCHEMA = [
   // Email delivery per lead: null = not sent yet, 'sent', or 'failed' (Resend refused it for good).
   'ALTER TABLE leads ADD COLUMN IF NOT EXISTS team_email_status text',
   'ALTER TABLE leads ADD COLUMN IF NOT EXISTS visitor_email_status text',
+  // When the lead went out in the daily Excel email; null = not sent yet.
+  'ALTER TABLE leads ADD COLUMN IF NOT EXISTS daily_report_at timestamptz',
 ];
 
 let dbPromise: Promise<Db> | null = null;

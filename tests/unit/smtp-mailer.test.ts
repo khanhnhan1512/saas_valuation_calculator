@@ -57,6 +57,15 @@ describe('SMTP mailer', () => {
     expect(mailer.teamAddress).toBe('leads@aspen.example');
   });
 
+  it('passes attachments on to nodemailer', async () => {
+    const sendMail = vi.fn(async () => ({}));
+    const mailer = createSmtpMailer(CONFIG, { sendMail });
+    await mailer.send({ ...EMAIL, attachments: [{ filename: 'leads.xlsx', content: new Uint8Array([1, 2, 3]) }] }, 'k');
+    expect(sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({ attachments: [{ filename: 'leads.xlsx', content: Buffer.from([1, 2, 3]) }] }),
+    );
+  });
+
   it('maps a failed send to retry or rejected', async () => {
     const failing = (err: object): SmtpTransport => ({
       sendMail: async () => {

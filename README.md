@@ -5,7 +5,7 @@ A founder enters ARR, a software category or industry, and contact details. Then
 - They get an indicative value range. It stays blurred until the lead form is valid.
 - The lead is stored in Postgres, and is kept on the device if the booth Wi-Fi drops.
 - The visitor gets their result by email, and the shared company inbox gets every lead.
-- Staff export all leads to Excel.
+- Every evening the shared inbox gets the new leads as an Excel file; staff can also export all leads from `/staff`.
 
 Stack: Next.js 16 (App Router, TypeScript), plain CSS modules, Neon Postgres on Vercel, PGlite (embedded Postgres) for local development and tests, Resend for email, ExcelJS, Vitest, Playwright.
 
@@ -45,6 +45,7 @@ Useful URLs:
 | `RESEND_API_KEY` | Vercel | Resend API key. Required on Vercel. |
 | `EMAIL_FROM` | Vercel | Sender on the domain verified in Resend, e.g. `Aspen Valuations <no-reply@aspenval.com>` |
 | `EMAIL_TEAM_TO` | Vercel | Shared company inbox: gets every lead and the visitors' replies |
+| `CRON_SECRET` | Vercel | 16+ random characters; lets Vercel Cron run the daily Excel email |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Vercel (optional) | Send over SMTP instead of Resend, e.g. Gmail for a demo. `SMTP_HOST` set means SMTP is used. |
 
 ## Docs

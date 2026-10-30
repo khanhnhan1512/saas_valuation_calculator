@@ -30,5 +30,6 @@ Booth URL: `https://<your-domain>/?source=saas-north-2026-booth&kiosk=1`
 
 ## End of day
 - [ ] Every device shows no "queued" count (connect to the hotspot and wait if needed).
-- [ ] On the laptop: open `/staff`, sign in, **Download all leads**, save the file to Aspen's drive, then **Sign out**.
+- [ ] Between 18:00 and 19:00 (Toronto) the connect@ inbox gets "SaaS calculator leads: N new" with the day's Excel file. Save it to Aspen's drive.
+- [ ] Need the list sooner? On a staff laptop or phone (never a booth device): open `/staff`, sign in, **Download all leads**, then **Sign out**.
 - [ ] Delete local copies of the spreadsheet (personal data).

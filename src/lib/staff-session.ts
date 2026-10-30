@@ -22,7 +22,7 @@ function sign(payload: string, key: string): string {
   return createHmac('sha256', key).update(payload).digest('base64url');
 }
 
-function safeEqual(a: string, b: string): boolean {
+export function safeEqual(a: string, b: string): boolean {
   // Hash first so inputs of different length still compare in constant time.
   const ha = createHash('sha256').update(a).digest();
   const hb = createHash('sha256').update(b).digest();

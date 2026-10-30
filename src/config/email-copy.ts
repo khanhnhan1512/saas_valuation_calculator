@@ -34,4 +34,13 @@ export const EMAIL_COPY = {
     source: 'Source',
   },
   rangeValue: (value: string, multiple: string) => `${value} (${multiple} ARR)`,
+
+  dailySubject: (count: number, day: string) => `SaaS calculator leads: ${count} new (${day})`,
+  dailyIntro: (count: number) =>
+    `${count === 1 ? '1 new lead' : `${count} new leads`} since the last email. The Excel file with every detail is attached.`,
+  dailyMore: (count: number) => `And ${count} more in the attached file.`,
+  dailyStaffHint: 'The full list of all leads is always on the staff page:',
 } as const;
+
+/** The daily email lists at most this many leads in its body; the Excel file has all of them. */
+export const DAILY_EMAIL_LIST_MAX = 50;

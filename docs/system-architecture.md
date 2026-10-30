@@ -33,6 +33,12 @@ Staff browser ── /staff (password) → GET /api/export (.xlsx), GET /api/lea
 6. The visitor email greets by first name only when it looks like a name, so the form cannot carry links to other inboxes. Everything a visitor types is HTML-escaped.
 7. SMTP (`src/lib/smtp-mailer.ts`, nodemailer) replaces Resend when `SMTP_HOST` is set, e.g. Gmail for a demo. SMTP has no idempotency key; a fixed Message-ID per lead and email stands in. Only a bad address (SMTP 5.1.x) counts as refused for good.
 
+## Daily Excel email (Vercel Cron)
+1. `vercel.json` runs `GET /api/cron/daily-leads` once a day (`0 23 * * *` UTC). The route accepts only `Authorization: Bearer <CRON_SECRET>`.
+2. One `UPDATE ... SET daily_report_at = <run time> WHERE daily_report_at IS NULL` claims every lead not yet sent, so a duplicate run claims nothing.
+3. The claimed leads go to `EMAIL_TEAM_TO` as `SaaS_North_Leads_YYYY-MM-DD.xlsx` (same workbook as `/api/export`).
+4. If the email fails, the claim is released and the next run sends those leads; a missed run is caught up the same way.
+
 ## Staff access
 - `/staff` checks `STAFF_PASSWORD` in constant time, with a delay after a failed attempt.
 - After sign-in it sets the `aspen_staff` cookie: httpOnly, `<expiry>.<HMAC-SHA256>` signed with `AUTH_SECRET`, valid 12 h.
