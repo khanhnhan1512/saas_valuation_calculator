@@ -18,6 +18,8 @@ export async function GET(request: Request) {
     const result = await sendDailyReport(await getDb(), mailerFromEnv(), {
       staffUrl: host ? `https://${host}/staff` : null,
     });
+    // One line per run (no personal data), so Cron Jobs > View Logs shows what happened.
+    console.log(`daily lead email: ${result.status}, ${result.count} leads`);
     return Response.json(result, { status: result.status === 'retry' ? 503 : 200, headers: NO_STORE });
   } catch (err) {
     console.error('daily lead email failed:', err instanceof Error ? err.name : 'unknown');
