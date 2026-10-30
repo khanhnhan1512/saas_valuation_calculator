@@ -55,6 +55,7 @@ export function createResendMailer(config: ResendConfig, fetchImpl: typeof fetch
             attachments: email.attachments?.map((a) => ({
               filename: a.filename,
               content: Buffer.from(a.content).toString('base64'),
+              ...(a.contentId && { content_id: a.contentId }),
             })),
           }),
           signal: AbortSignal.timeout(EMAIL_TIMEOUT_MS),

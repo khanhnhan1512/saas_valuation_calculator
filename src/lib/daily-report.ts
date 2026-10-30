@@ -36,7 +36,7 @@ export async function sendDailyReport(
     const email = dailyLeadsEmail(leads, mailer.teamAddress, staffUrl, now);
     const file = await buildLeadsWorkbook(leads);
     const outcome = await mailer.send(
-      { ...email, attachments: [{ filename: exportFileName(now), content: file }] },
+      { ...email, attachments: [...(email.attachments ?? []), { filename: exportFileName(now), content: file }] },
       `daily-leads-${runAt}`,
     );
     if (outcome === 'sent') return { status: 'sent', count: leads.length };

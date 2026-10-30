@@ -11,9 +11,18 @@ export const EMAIL_COPY = {
   visitorIntro: 'Thank you for using the Aspen Valuations SaaS calculator. Here is your indicative value range.',
   ctaHeading: COPY.aspenHeading,
   ctaText: `${COPY.aspenIntroBold}${COPY.aspenIntroRest}`,
+  learnMore: 'Want to learn more about how SaaS companies are valued and the factors that drive valuation?',
+  guideLead: 'Read more on our SaaS valuation page:',
+  guideLink: 'Aspen SaaS Valuation Guide',
   ctaButton: 'Book a free valuation call',
   replyHint: 'Questions? Reply to this email.',
   signOff: 'The Aspen Valuations team',
+  offices: [
+    { city: 'Calgary', phone: '(587) 429-2913' },
+    { city: 'Toronto', phone: '(647) 451-5164' },
+    { city: 'Vancouver', phone: '(604) 600-7550' },
+  ],
+  logoAlt: 'Aspen Valuations',
   whyReceived: 'You received this email because you asked for this estimate on the Aspen Valuations SaaS calculator.',
 
   teamSubject: (name: string, company: string, mid: string) => `New lead: ${name}, ${company} (${mid} midpoint)`,

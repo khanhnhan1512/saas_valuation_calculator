@@ -66,6 +66,16 @@ describe('SMTP mailer', () => {
     );
   });
 
+  it('passes an inline image on as a cid attachment', async () => {
+    const sendMail = vi.fn(async () => ({}));
+    const mailer = createSmtpMailer(CONFIG, { sendMail });
+    const logo = { filename: 'logo.png', content: new Uint8Array([1]), contentId: 'aspen-logo' };
+    await mailer.send({ ...EMAIL, attachments: [logo] }, 'k');
+    expect(sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({ attachments: [{ filename: 'logo.png', content: Buffer.from([1]), cid: 'aspen-logo' }] }),
+    );
+  });
+
   it('maps a failed send to retry or rejected', async () => {
     const failing = (err: object): SmtpTransport => ({
       sendMail: async () => {

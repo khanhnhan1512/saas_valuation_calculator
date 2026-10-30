@@ -57,7 +57,11 @@ export function createSmtpMailer(config: SmtpConfig, transport?: SmtpTransport):
           html: email.html,
           text: email.text,
           ...(email.attachments && {
-            attachments: email.attachments.map((a) => ({ filename: a.filename, content: Buffer.from(a.content) })),
+            attachments: email.attachments.map((a) => ({
+              filename: a.filename,
+              content: Buffer.from(a.content),
+              ...(a.contentId && { cid: a.contentId }),
+            })),
           }),
           // SMTP has no idempotency key. A fixed Message-ID per lead and email lets mail services
           // that dedupe by Message-ID drop a rare repeat sent after a lost response.

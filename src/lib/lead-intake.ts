@@ -2,11 +2,12 @@
 import { z } from 'zod';
 import { ARR_MAX, SOURCE_PATTERN, SOURCE_WEBSITE } from '@/config/valuation-config';
 import type { Db } from './db';
-import { teamEmail, visitorEmail } from './lead-emails';
+import { teamEmail } from './lead-emails';
 import { normalizeContact, validateLead } from './lead-validation';
 import { getEmailStatus, insertLead, setEmailStatus, type LeadRecord } from './leads-repository';
 import type { Mailer } from './mailer';
 import { estimate, resolveSelection } from './valuation';
+import { visitorEmail } from './visitor-email';
 
 export const MAX_BODY_BYTES = 4096;
 

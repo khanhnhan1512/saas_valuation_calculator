@@ -105,3 +105,5 @@ export const QUEUE_RETRY_MS = 30_000;
 /** Per email; two emails plus the insert must finish inside the browser's 10 s request timeout. */
 export const EMAIL_TIMEOUT_MS = 4_000;
 export const CONTACT_URL = 'https://aspenval.com/ca/contact-us/';
+export const ASPEN_HOME_URL = 'https://aspenval.com/';
+export const SAAS_GUIDE_URL = 'https://aspenval.com/ca/saas-valuation/';

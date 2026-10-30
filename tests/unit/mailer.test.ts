@@ -65,6 +65,18 @@ describe('Resend mailer', () => {
     expect(JSON.parse(init.body as string).attachments).toEqual([{ filename: 'leads.xlsx', content: 'AQID' }]);
   });
 
+  it('sends an inline image with its content_id', async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ id: 'email-3' }));
+    const mailer = createResendMailer(CONFIG, fetchImpl as unknown as typeof fetch);
+    const logo = { filename: 'logo.png', content: new Uint8Array([1, 2, 3]), contentId: 'aspen-logo' };
+
+    await mailer.send({ ...EMAIL, attachments: [logo] }, 'k');
+    const [, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(JSON.parse(init.body as string).attachments).toEqual([
+      { filename: 'logo.png', content: 'AQID', content_id: 'aspen-logo' },
+    ]);
+  });
+
   it('retries after a network error and reports a refused email', async () => {
     const offline = createResendMailer(CONFIG, (async () => {
       throw new TypeError('fetch failed');

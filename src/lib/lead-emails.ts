@@ -1,14 +1,15 @@
-// Builds the emails: per lead, the visitor's result and the lead details for the team inbox;
-// once a day, the summary that carries the Excel file.
+// Email building blocks, plus the team emails: per lead, the lead details for the team inbox;
+// once a day, the summary that carries the Excel file. The visitor's email is in visitor-email.ts.
 import { DAILY_EMAIL_LIST_MAX, EMAIL_COPY } from '@/config/email-copy';
-import { COPY } from '@/config/site-copy';
-import { CONTACT_URL, EVENT_TIMEZONE } from '@/config/valuation-config';
+import { EVENT_TIMEZONE } from '@/config/valuation-config';
 import { formatArrInput, formatMoney, formatMultiple } from './formatters';
 import type { ExportRow, LeadRecord } from './leads-repository';
 
 export interface EmailAttachment {
   filename: string;
   content: Uint8Array;
+  /** Set for an inline image, referenced in the HTML as src="cid:<contentId>". */
+  contentId?: string;
 }
 
 export interface OutgoingEmail {
@@ -20,16 +21,12 @@ export interface OutgoingEmail {
   attachments?: EmailAttachment[];
 }
 
-type Row = { label: string; value: string; href?: string };
+export type Row = { label: string; value: string; href?: string };
 
-// Anyone can type anything in the form. Greet by name only when it looks like a name, so the
-// form cannot be used to put links or messages into other people's inboxes.
-const SAFE_FIRST_NAME = /^[\p{L}\p{M}][\p{L}\p{M}' ’-]{0,39}$/u;
-
-const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+export const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 /** Subjects: one line, no control characters, bounded length. */
-const oneLine = (s: string) => s.replace(/\p{Cc}+/gu, ' ').trim().slice(0, 160);
+export const oneLine = (s: string) => s.replace(/\p{Cc}+/gu, ' ').trim().slice(0, 160);
 
 const submittedFormat = new Intl.DateTimeFormat('en-CA', {
   timeZone: EVENT_TIMEZONE,
@@ -39,7 +36,7 @@ const submittedFormat = new Intl.DateTimeFormat('en-CA', {
 
 const dayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: EVENT_TIMEZONE, dateStyle: 'medium' });
 
-function resultRows(lead: LeadRecord): Row[] {
+export function resultRows(lead: LeadRecord): Row[] {
   const { labels, rangeValue } = EMAIL_COPY;
   return [
     { label: labels.arr, value: `$${formatArrInput(lead.arr)}` },
@@ -51,9 +48,9 @@ function resultRows(lead: LeadRecord): Row[] {
   ];
 }
 
-const p = (text: string, style = '') => `<p style="margin:0 0 12px;${style}">${escapeHtml(text)}</p>`;
+export const p = (text: string, style = '') => `<p style="margin:0 0 12px;${style}">${escapeHtml(text)}</p>`;
 
-function tableHtml(rows: Row[]): string {
+export function tableHtml(rows: Row[]): string {
   const cell = 'padding:8px 0;border-bottom:1px solid #E1EAE8;vertical-align:top;';
   const body = rows
     .map(({ label, value, href }) => {
@@ -64,54 +61,18 @@ function tableHtml(rows: Row[]): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:8px 0 20px">${body}</table>`;
 }
 
-function pageHtml(body: string): string {
+const BRAND_TEXT = `<p style="margin:0 0 20px;color:#1A322F;font-size:12px;font-weight:bold;letter-spacing:0.2em">${EMAIL_COPY.brand}</p>`;
+
+/** The white card every email sits in; `header` replaces the text brand line (e.g. with the logo). */
+export function pageHtml(body: string, header = BRAND_TEXT): string {
   return (
     '<!doctype html><html><body style="margin:0;padding:24px 12px;background:#F3F7F6;font-family:Arial,Helvetica,sans-serif">' +
     '<div style="max-width:560px;margin:0 auto;padding:24px;background:#FFFFFF;border-top:4px solid #05B4C9;border-radius:8px;color:#12302C;font-size:15px;line-height:1.5">' +
-    `<p style="margin:0 0 20px;color:#1A322F;font-size:12px;font-weight:bold;letter-spacing:0.2em">${EMAIL_COPY.brand}</p>` +
-    `${body}</div></body></html>`
+    `${header}${body}</div></body></html>`
   );
 }
 
-const rowsText = (rows: Row[]) => rows.map((r) => `${r.label}: ${r.value}`).join('\n');
-
-export function visitorEmail(lead: LeadRecord, teamAddress: string): OutgoingEmail {
-  const low = formatMoney(lead.lowValue);
-  const high = formatMoney(lead.highValue);
-  const headline = `${low} ${COPY.rangeJoiner} ${high}`;
-  const basis = COPY.basisLine(formatMultiple(lead.lowMultiple), formatMultiple(lead.highMultiple));
-  const greeting = EMAIL_COPY.visitorGreeting(SAFE_FIRST_NAME.test(lead.firstName) ? lead.firstName : null);
-  const rows = resultRows(lead);
-  const small = 'color:#5B706C;font-size:12px;';
-
-  const html = pageHtml(
-    p(greeting) +
-      p(EMAIL_COPY.visitorIntro) +
-      p(headline, 'margin:20px 0 4px;font-size:28px;font-weight:bold') +
-      p(basis, 'color:#5B706C') +
-      tableHtml(rows) +
-      p(EMAIL_COPY.ctaHeading, 'font-size:17px;font-weight:bold') +
-      p(EMAIL_COPY.ctaText) +
-      `<p style="margin:0 0 20px"><a href="${CONTACT_URL}" style="display:inline-block;padding:12px 20px;border-radius:8px;background:#05B4C9;color:#062421;font-weight:bold;text-decoration:none">${escapeHtml(EMAIL_COPY.ctaButton)}</a></p>` +
-      p(EMAIL_COPY.replyHint) +
-      p(EMAIL_COPY.signOff) +
-      p(COPY.finePrint, `margin-top:24px;${small}`) +
-      p(EMAIL_COPY.whyReceived, small),
-  );
-
-  const text = [
-    greeting,
-    EMAIL_COPY.visitorIntro,
-    `${headline}\n${basis}`,
-    rowsText(rows),
-    `${EMAIL_COPY.ctaHeading}\n${EMAIL_COPY.ctaText}\n${EMAIL_COPY.ctaButton}: ${CONTACT_URL}`,
-    `${EMAIL_COPY.replyHint}\n${EMAIL_COPY.signOff}`,
-    COPY.finePrint,
-    EMAIL_COPY.whyReceived,
-  ].join('\n\n');
-
-  return { to: lead.email, replyTo: teamAddress, subject: oneLine(EMAIL_COPY.visitorSubject(low, high)), html, text };
-}
+export const rowsText = (rows: Row[]) => rows.map((r) => `${r.label}: ${r.value}`).join('\n');
 
 export function teamEmail(lead: LeadRecord, teamAddress: string): OutgoingEmail {
   const { labels } = EMAIL_COPY;

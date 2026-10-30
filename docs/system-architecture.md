@@ -31,6 +31,7 @@ Staff browser ── /staff (password) → GET /api/export (.xlsx), GET /api/lea
 4. Resend refusing an email for good (400/422) marks it `failed`; it is not retried.
 5. Email is off when the variables are missing locally. On Vercel, missing variables count as a temporary failure.
 6. The visitor email greets by first name only when it looks like a name, so the form cannot carry links to other inboxes. Everything a visitor types is HTML-escaped.
+   Its layout follows Aspen's approved version. The logo travels inside the email as an inline `cid:` image (Outlook blocks images loaded from the web), and the button is a one-cell table so Outlook sizes it to its text.
 7. SMTP (`src/lib/smtp-mailer.ts`, nodemailer) replaces Resend when `SMTP_HOST` is set, e.g. Gmail for a demo. SMTP has no idempotency key; a fixed Message-ID per lead and email stands in. Only a bad address (SMTP 5.1.x) counts as refused for good.
 
 ## Daily Excel email (Vercel Cron)

@@ -14,7 +14,9 @@ src/
   lib/lead-queue-storage.ts    localStorage write-ahead queue
   lib/lead-queue-sync.ts       sequential sending and retry loop
   lib/lead-intake.ts           POST /api/leads logic (zod, honeypot, recalculation, insert, email delivery)
-  lib/lead-emails.ts           builds the visitor and team emails (HTML + text, escaped)
+  lib/lead-emails.ts           email building blocks + team lead email and daily summary (HTML + text, escaped)
+  lib/visitor-email.ts         visitor result email in Aspen's approved layout (logo, guide link, offices)
+  lib/email-logo.ts            inline logo (base64 of assets/email-logo.png), sent as a cid: image
   lib/mailer.ts                Resend client, outcome mapping (sent / rejected / retry), env setup
   lib/smtp-mailer.ts           SMTP alternative (nodemailer), e.g. Gmail for a demo
   lib/daily-report.ts          daily Excel email: claim unsent leads, email them, release on failure

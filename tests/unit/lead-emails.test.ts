@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { CONTACT_URL } from '@/config/valuation-config';
-import { teamEmail, visitorEmail } from '@/lib/lead-emails';
+import { CONTACT_URL, SAAS_GUIDE_URL } from '@/config/valuation-config';
+import { teamEmail } from '@/lib/lead-emails';
 import type { LeadRecord } from '@/lib/leads-repository';
+import { visitorEmail } from '@/lib/visitor-email';
 
 const TEAM = 'leads@aspen.example';
 
@@ -47,6 +48,33 @@ describe('visitor email', () => {
       expect(part).toContain('Indicative only, not a formal valuation.');
       expect(part).not.toContain('Industry-specific');
     }
+  });
+
+  it('follows the approved layout: guide link, office numbers, bold sign-off', () => {
+    const email = visitorEmail(lead(), TEAM);
+    for (const part of [email.text, email.html]) {
+      expect(part).toContain('Want to learn more about how SaaS companies are valued');
+      expect(part).toContain('Read more on our SaaS valuation page:');
+      expect(part).toContain(SAAS_GUIDE_URL);
+      expect(part).toContain('(587) 429-2913');
+      expect(part).toContain('(647) 451-5164');
+      expect(part).toContain('(604) 600-7550');
+    }
+    expect(email.html).toContain('>Aspen SaaS Valuation Guide</a>');
+    expect(email.html).toContain('font-weight:bold">The Aspen Valuations team</p>');
+    // The button is a one-cell table so Outlook sizes it to its text.
+    expect(email.html).toMatch(/<td bgcolor="#05B4C9"[^>]*><a href="https:\/\/aspenval\.com\/ca\/contact-us\/"/);
+  });
+
+  it('embeds the logo as an inline image', () => {
+    const email = visitorEmail(lead(), TEAM);
+    expect(email.html).toContain('<img src="cid:aspen-logo"');
+    expect(email.html).toContain('alt="Aspen Valuations"');
+    const [logo] = email.attachments!;
+    expect(logo.contentId).toBe('aspen-logo');
+    expect(logo.filename).toBe('aspen-logo.png');
+    // PNG signature.
+    expect([...logo.content.slice(0, 4)]).toEqual([0x89, 0x50, 0x4e, 0x47]);
   });
 
   it('shows the software category when no industry was picked', () => {
